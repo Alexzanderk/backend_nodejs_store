@@ -74,5 +74,11 @@ module.exports = {
 
         req.flash('success', 'Updeated!');
         res.redirect(`/stores/${store._id}/edit`);
+    },
+
+    async getStoreBySlug(req, res, next) {
+        let store = await Store.findOne({ slug: req.params.slug });
+        if (!store) return next();
+        res.render('store', { store, tittle: store.name });
     }
 };
