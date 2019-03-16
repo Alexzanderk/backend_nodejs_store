@@ -80,5 +80,15 @@ module.exports = {
         let store = await Store.findOne({ slug: req.params.slug });
         if (!store) return next();
         res.render('store', { store, tittle: store.name });
+    },
+
+    async getStoreByTag(req, res) {
+        const tag = req.params.tag;
+        const tagQuery = tag || { $exists: true };
+        const tagsPromise = Store.getTagsList();
+        const storesPromise = Store.find({ tags: tagQuery });
+        const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
+        // res.json(result)
+        res.render('tags', { tags, title: 'Tags', tag, stores });
     }
 };
