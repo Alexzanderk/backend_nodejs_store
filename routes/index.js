@@ -12,7 +12,7 @@ router.get('/', catchErrors(storeController.getStores));
 router.get('/stores', catchErrors(storeController.getStores));
 router.get('/stores/:id/edit', catchErrors(storeController.editStores));
 
-router.get('/add', storeController.addSrote);
+router.get('/add', authController.isLoggesIn, storeController.addSrote);
 router.post(
     '/add',
     storeController.upload,
@@ -32,6 +32,7 @@ router.get('/tags', catchErrors(storeController.getStoreByTag));
 router.get('/tags/:tag', catchErrors(storeController.getStoreByTag));
 
 router.get('/login', userController.loginForm);
+router.post('/login', authController.login);
 router.get('/register', userController.registerForm);
 router.post(
     '/register',
@@ -39,5 +40,6 @@ router.post(
     userController.register,
     authController.login
 );
+router.get('/logout', authController.logout);
 
 module.exports = router;
