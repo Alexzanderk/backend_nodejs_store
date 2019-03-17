@@ -88,7 +88,7 @@ module.exports = {
         const tagsPromise = Store.getTagsList();
         const storesPromise = Store.find({ tags: tagQuery });
         const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
-        // res.json(result)
+        
         res.render('tags', { tags, title: 'Tags', tag, stores });
     }
 };

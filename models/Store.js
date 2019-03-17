@@ -1,5 +1,3 @@
-// import mongoose, { Schema, Model } from 'mongoose';
-// import slug from 'slugs';
 const mongoose = require('mongoose');
 const slug = require('slugs');
 
