@@ -15,6 +15,12 @@ const multerOptions = {
     }
 };
 
+const confirmOwner = (store, user) => {
+    if(!store.author.equals(user._id)) {
+        throw Error('You must own a store in order to edit it!')
+    }
+};
+
 module.exports = {
     addSrote(req, res) {
         res.render('editStore', {
@@ -38,6 +44,7 @@ module.exports = {
 
     async createStore(req, res) {
         console.log(req.body);
+        req.body.author = req.user._id;
         const store = await new Store(req.body).save();
         req.flash(
             'success',
@@ -52,9 +59,11 @@ module.exports = {
         res.render('stores', { title: 'Stores', stores });
     },
 
+    
+
     async editStores(req, res) {
         const store = await Store.findOne({ _id: req.params.id });
-
+        confirmOwner(store, req.user)
         res.render('editStore', { title: `Edit Store ${store.name}`, store });
     },
 
@@ -77,7 +86,7 @@ module.exports = {
     },
 
     async getStoreBySlug(req, res, next) {
-        let store = await Store.findOne({ slug: req.params.slug });
+        let store = await Store.findOne({ slug: req.params.slug }).populate('author');
         if (!store) return next();
         res.render('store', { store, tittle: store.name });
     },
@@ -88,7 +97,7 @@ module.exports = {
         const tagsPromise = Store.getTagsList();
         const storesPromise = Store.find({ tags: tagQuery });
         const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
-        
+
         res.render('tags', { tags, title: 'Tags', tag, stores });
     }
 };

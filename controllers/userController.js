@@ -50,5 +50,23 @@ module.exports = {
         const register = promisify(User.register, User);
         await register(user, password);
         next();
+    },
+
+    account(req, res) {
+        res.render('account', { title: 'Edit Your Account' });
+    },
+
+    async updateAccount(req, res) {
+        const { name, email } = req.body;
+        const updates = { name, email };
+
+        const user = await User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $set: updates },
+            { new: true, runValidators: true, context: 'query' }
+        );
+        req.flash('success', 'Updated')
+
+        res.redirect('back')
     }
 };
