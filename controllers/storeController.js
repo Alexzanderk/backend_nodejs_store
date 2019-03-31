@@ -16,8 +16,8 @@ const multerOptions = {
 };
 
 const confirmOwner = (store, user) => {
-    if(!store.author.equals(user._id)) {
-        throw Error('You must own a store in order to edit it!')
+    if (!store.author.equals(user._id)) {
+        throw Error('You must own a store in order to edit it!');
     }
 };
 
@@ -59,11 +59,9 @@ module.exports = {
         res.render('stores', { title: 'Stores', stores });
     },
 
-    
-
     async editStores(req, res) {
         const store = await Store.findOne({ _id: req.params.id });
-        confirmOwner(store, req.user)
+        confirmOwner(store, req.user);
         res.render('editStore', { title: `Edit Store ${store.name}`, store });
     },
 
@@ -86,7 +84,9 @@ module.exports = {
     },
 
     async getStoreBySlug(req, res, next) {
-        let store = await Store.findOne({ slug: req.params.slug }).populate('author');
+        let store = await Store.findOne({ slug: req.params.slug }).populate(
+            'author'
+        );
         if (!store) return next();
         res.render('store', { store, tittle: store.name });
     },
@@ -99,5 +99,27 @@ module.exports = {
         const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
 
         res.render('tags', { tags, title: 'Tags', tag, stores });
+    },
+
+    async searchStore(req, res) {
+        const store = await Store
+            // first find stores that match
+            .find(
+                {
+                    $text: {
+                        $search: req.query.q
+                    }
+                },
+                {
+                    score: { $meta: 'textScore' }
+                }
+            )
+            // the sort them
+            .sort({
+                score: { $meta: 'textScore' }
+            })
+            // limit to only 5 results
+            .limit(5);
+        res.json(store);
     }
 };
